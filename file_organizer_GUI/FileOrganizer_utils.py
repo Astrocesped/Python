@@ -22,7 +22,7 @@ except ImportError:
     import sip
 
     # Signal class aliases the PyQt4.QtCore.pyqtSignal class
-    Signal = QtCore.pyqtSignal
+    Signal = QtCore.SIGNAL
 
 import os
 import logging
@@ -38,7 +38,8 @@ def norm_pathname(pathname=""):
     if not pathname:
         return os.path.normpath(os.getcwd())
     else:
-        return os.path.normpath(pathname)
+	# Convert QString to str to avoid posix difficulties
+        return os.path.normpath(str(pathname))
 
 def retrieve_directory_content(directory):
     """
@@ -46,6 +47,9 @@ def retrieve_directory_content(directory):
     :param directory: Normalized pathname of a directory
     :return: List of filenames (directories skipped)
     """
+    # Convert directory to explicit str, to avoid posixpath complications
+    directory = str(directory)
+
     content = [f for f in os.listdir(directory)
                if os.path.isfile(os.path.join(directory, f))]
     content.sort()
