@@ -8,7 +8,9 @@ import os
 from stat import ST_CTIME
 from time import localtime
 from shutil import copyfile as shutil_copyfile
-from FileOrganizer_utils import sort_list
+from FileOrganizer_utils import sort_list, start_logging
+from logging import info as log_info
+from logging import error as log_error
 
 def move_files(origin, files, destination, id_order, custom_preorder,
                numbering, removing, lowercase=False, duplicate=False,
@@ -76,16 +78,20 @@ def move_files(origin, files, destination, id_order, custom_preorder,
         :return: None
         """
 
-        # Create the name of the file in its new directory
         # Take care of removing or lowercase transformation if desired
-        final_pathname = os.path.join(destination,
-                                      replace_lower(destination_name)
-                                      if removing[0] or lowercase
-                                      else destination_name)
+        destination_name = replace_lower(destination_name) if removing[0] \
+                           or lowercase else destination_name
+
+        # Create the pathname of the file in its new directory
+        final_pathname = os.path.join(destination, destination_name)
 
         # If files should be replaced, get rid of any file
         # that already has the same name in the destination folder
         if replace_files and os.path.exists(final_pathname):
+            # Log information about the file being removed
+            log_info("Removing {} from {} as it will be overwritten".format(
+                destination_name, destination))
+
             os.remove(final_pathname)
 
         # If the files should not be deleted from the original folder,
@@ -98,10 +104,20 @@ def move_files(origin, files, destination, id_order, custom_preorder,
         elif not os.path.exists(final_pathname):
             os.rename(os.path.join(origin, origin_name), final_pathname)
 
+        # Log the new file movement
+        log_info("File {} in {} moved with name {} to {}".format(origin_name,
+                                                                 origin,
+                                                                 destination_name,
+                                                                 destination))
+
     # ------ END OF UTILITY CLOSURES ---------
 
+    # Start a new logging session
+    start_logging()
+
     if not files:
-        # No files were checked; abort
+        # No files were checked; log error and abort
+        log_error("Attempted to move files, but no origin files checked.")
         raise NoSelectedFiles("No files selected to move in origin folder")
 
     # Check pre-order to apply before moving/renaming the files
@@ -176,9 +192,9 @@ def move_files(origin, files, destination, id_order, custom_preorder,
             digits = "{{:04d}}"
 
         for i, f in enumerate(original_files):
-	    ext_period = f.rfind(".")
+            ext_period = f.rfind(".")
             # If the filename has no extension, nothing else should be appended
-	    cut_from = ext_period + 1 if ext_period > 0 else len(f)
+            cut_from = ext_period + 1 if ext_period > 0 else len(f)
 
             # If the user checked the numeration checkbox but inserted no
             # pattern, maybe they just want the number to be the filename

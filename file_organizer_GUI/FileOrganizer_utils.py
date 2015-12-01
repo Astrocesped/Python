@@ -27,6 +27,19 @@ except ImportError:
 import os
 import logging
 
+# ------- LOGGING FEATURE ------------
+LOG_FILENAME = "file_mover_log.log"
+LOG_FORMAT = "%(asctime)s - %(levelname)s - %(funcName)s - %(message)s"
+
+def start_logging(filename=LOG_FILENAME,
+                  log_level=logging.INFO,
+                  log_format=LOG_FORMAT):
+    """
+    Starts basic logging of a module.
+    """
+    logging.basicConfig(filename=os.path.normpath(filename),
+                        level=log_level, format=log_format)
+
 # ------- UTILITY FUNCTIONS ----------
 
 def norm_pathname(pathname=""):
@@ -38,7 +51,7 @@ def norm_pathname(pathname=""):
     if not pathname:
         return os.path.normpath(os.getcwd())
     else:
-	# Convert QString to str to avoid posix difficulties
+        # Convert QString to str to avoid posix difficulties
         return os.path.normpath(str(pathname))
 
 def retrieve_directory_content(directory):

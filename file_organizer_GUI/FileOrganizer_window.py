@@ -331,7 +331,7 @@ class FileOrganizerWindow(QtGui.QMainWindow):
         """
         Callback function that invokes FileOrganizer's move_files function
         """
-	# Explicit conversion to string to avoid complications in posixpath
+        # Explicit conversion to string to avoid complications in posixpath
         # Skip the first two spaces displayed in each filename of the
         # Destination directory. Only consider the checked items
         origin_filenames = [str(self.origin_content.model.item(i).text()[2:])
