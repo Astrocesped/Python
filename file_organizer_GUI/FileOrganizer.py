@@ -168,7 +168,6 @@ def move_files(origin, files, destination, id_order, custom_preorder,
     # If the new filenames will follow a prefixed/suffixed number pattern
     # then create their names according to the ordered original_files
     if numbering[0]:
-
         try:
             # Create a format string with the number of digits
             digits = "{{:0{}d}}".format(int(numbering[1]))
@@ -177,24 +176,28 @@ def move_files(origin, files, destination, id_order, custom_preorder,
             digits = "{{:04d}}"
 
         for i, f in enumerate(original_files):
+	    ext_period = f.rfind(".")
+            # If the filename has no extension, nothing else should be appended
+	    cut_from = ext_period + 1 if ext_period > 0 else len(f)
+
             # If the user checked the numeration checkbox but inserted no
             # pattern, maybe they just want the number to be the filename
             if not numbering[3]:
-                move_file(f, "{}{}".format(digits.format(i), f[f.rfind("."):]))
+                move_file(f, "{}{}".format(digits.format(i), f[cut_from:]))
 
             # If the numbering pattern should go after the custom pattern,
             # name should be: custom pattern, digits, extension
             elif numbering[2] == 0:
                 move_file(f, "{}{}{}".format(numbering[3],
                                              digits.format(i),
-                                             f[f.rfind("."):]))
+                                             f[cut_from:]))
 
             # But if the numbering pattern should go before the custom pattern
             # the new name should be: digits, custom pattern, extension
             else:
                 move_file(f, "{}{}{}".format(digits.format(i),
                                              numbering[3],
-                                             f[f.rfind("."):]))
+                                             f[cut_from:]))
 
     # Else there is not a special numbering pattern to rename the files with
     else:
