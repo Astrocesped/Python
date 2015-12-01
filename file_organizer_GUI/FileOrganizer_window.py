@@ -294,7 +294,7 @@ class FileOrganizerWindow(QtGui.QMainWindow):
         main_layout.addLayout(options_vbox)
 
         # Add the main Window's StatusBar for warnings
-        self.status_label = new_label("", 8)
+        self.status_label = new_label("", 8, color="333333")
         self.statusBar().addPermanentWidget(self.status_label)
 
         main_container.setLayout(main_layout)
@@ -331,26 +331,26 @@ class FileOrganizerWindow(QtGui.QMainWindow):
         """
         Callback function that invokes FileOrganizer's move_files function
         """
-
+	# Explicit conversion to string to avoid complications in posixpath
         # Skip the first two spaces displayed in each filename of the
         # Destination directory. Only consider the checked items
-        origin_filenames = [self.origin_content.model.item(i).text()[2:] for i
-                            in range(self.origin_content.model.rowCount())
+        origin_filenames = [str(self.origin_content.model.item(i).text()[2:])
+                            for i in range(self.origin_content.model.rowCount())
                             if self.origin_content.model.item(i).checkState()]
 
         try:
-            FileOrganizer.move_files(self.browse_textbox1.text(),
+            FileOrganizer.move_files(str(self.browse_textbox1.text()),
                                      origin_filenames,
-                                     self.browse_textbox2.text(),
+                                     str(self.browse_textbox2.text()),
                                      self.button_group.checkedId(),
                                      (self.custom_combo.currentIndex(),
-                                     self.custom_textbox.text()),
+                                     str(self.custom_textbox.text())),
                                      (self.numbering_check.isChecked(),
-                                     self.numbering_digits.text(),
+                                     str(self.numbering_digits.text()),
                                       self.numbering_combo.currentIndex(),
-                                      self.numbering_rename.text()),
+                                      str(self.numbering_rename.text())),
                                      (self.remove_check.isChecked(),
-                                      self.remove_textbox.text()),
+                                      str(self.remove_textbox.text())),
                                      self.lowercase_check.isChecked(),
                                      self.duplicate_check.isChecked(),
                                      self.replace_files.isChecked())
@@ -523,7 +523,7 @@ def new_checkbox(text):
     :return: QCheckbox
     """
     checkbox = QtGui.QCheckBox(text)
-    checkbox.setStyleSheet("color:#EEEEEE;")
+    checkbox.setStyleSheet("color:#CCCCCC;")
 
     cb_palette = checkbox.palette()
     cb_palette.setColor(QtGui.QPalette.Base, QtCore.Qt.gray)
@@ -533,7 +533,7 @@ def new_checkbox(text):
 
 def new_combo(items):
     combo = QtGui.QComboBox()
-    combo.setStyleSheet("background-color:#444444; color:#CCCCCC;")
+    combo.setStyleSheet("background-color:#444444; color:#FFFFFF;")
     combo.setFixedHeight(35)
     for item in items:
         combo.addItem(item)
@@ -559,17 +559,18 @@ def new_frame(parent, name, raised=False, fixed_size=True):
 
     return frame
 
-def new_label(text, size, bold=False):
+def new_label(text, size, bold=False, color="CCCCCC"):
     """
     Return a new QLabel
     :param text: Text that will be contained by the label
     :param size: Size of the label"s text
     :param color: Color of the label"s text
     :param bold: Boolean that tells whether to bold the label or not
+    :param color: Hexadecimal code of a color
     :return: QLabel
     """
     label = QtGui.QLabel(text)
-    label.setStyleSheet("color:#CCCCCC;")
+    label.setStyleSheet("color:#{};".format(color))
     label.setAlignment(QtCore.Qt.AlignCenter)
 
     font = QtGui.QFont()
@@ -591,7 +592,7 @@ def new_line_edit(size, readonly=False):
     textbox.setFixedHeight(25)
     textbox.setStyleSheet("background-color:#AAAAAA; border:none;")
     textbox.setReadOnly(readonly)
-    textbox.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
+    textbox.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
     return textbox
 
 def main():
